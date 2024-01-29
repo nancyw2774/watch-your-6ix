@@ -1,8 +1,17 @@
+import RPi.GPIO as GPIO
 from kld7 import KLD7
 
 class Radar:
 
     def __init__(self):
+        
+        GPIO.setmode(GPIO.BCM)
+
+        tx_pin = 23
+        rx_pin = 24
+
+        GPIO.setup(tx_pin, GPIO.OUT)
+        GPIO.setup(rx_pin, GPIO.OUT)
         try:
             self._conn = KLD7("/dev/ttyAMA0")
         except Exception as e:
