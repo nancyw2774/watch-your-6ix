@@ -19,20 +19,23 @@ class IMU:
         self._mag_q = deque([], maxlen=5)
         self._time_q = deque([], maxlen=5)
         
-        self._velo = 0
+        self._velo = [0, 0, 0]
 
     # run as thread to update values
-    def _update_params(self):
+    def update_params(self):
         x, y, z = self._conn.read_magnetometer_data()
         ax, ay, az, gx, gy, gz = self._conn.read_accelerometer_gyro_data()
         self._accel_q.append((ax, ay, az))
         self._gyro_q.append((gx, gy, gz))
         self._mag_q.append((x, y, z))
         self._time_q.append(time.perf_counter())
+        self._update_speed()
         time.sleep(0.25)
-        
+    
 
-    def get_speed(self):
+    def _update_speed(self):
+        if not self._accel_q:
+            return
         prev_vel = self._velo
         linear_acceleration = self._accel_q[-1]
         delta_t = self._time_q[-1] - self._time_q[-2]
@@ -42,6 +45,10 @@ class IMU:
         
         # Update previous velocity and time
         prev_vel = velocity
+
+
+    def get_speed(self):
+        return self._velo
 
 
     def print_params(self):
