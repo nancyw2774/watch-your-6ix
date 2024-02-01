@@ -20,7 +20,7 @@ import serial
 import matplotlib.pyplot as plt
 import numpy as np
 
-COM_Port = 'COM5'
+COM_Port = '/dev/ttyAMA0'
 
 # create serial object with corresponding COM Port and open it 
 com_obj=serial.Serial(COM_Port)
@@ -40,6 +40,7 @@ com_obj.write(cmd_init)
 response_init = com_obj.read(9)
 if response_init[8] != 0:
     print('Error during initialisation for K-LD7')
+print('K-LD7 initialized')
 
 # delay 75ms
 time.sleep(0.075)
@@ -54,6 +55,7 @@ cmd_frame = header+payloadlength+value
 com_obj.write(cmd_frame)
 
 # get response
+print('change speed range')
 response_init = com_obj.read(9)
 if response_init[8] != 0:
     print('Error: Command not acknowledged')
@@ -69,6 +71,7 @@ response_init = com_obj.read(9)
 if response_init[8] != 0:
     print('Error: Command not acknowledged')
 
+print('plot something')
 # create figure
 fig = plt.figure(figsize=(10,5))
 plt.ion()
