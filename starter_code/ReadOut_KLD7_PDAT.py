@@ -103,22 +103,40 @@ for ctr in range(100):
     
     length = resp_len[0]
     
-    # get data, until payloadlen is zero
-    while length > 0:
-        PDAT_Distance = np.frombuffer(com_obj.read(2), dtype=np.uint16)
-        PDAT_Speed = np.frombuffer(com_obj.read(2), dtype=np.int16)/100
-        PDAT_Angle = math.radians(np.frombuffer(com_obj.read(2), dtype=np.int16)/100)
-        PDAT_Magnitude = np.frombuffer(com_obj.read(2), dtype=np.uint16)
-        
-        distances_x[i] = -(PDAT_Distance * math.sin(PDAT_Angle))
-        distances_y[i] = PDAT_Distance * math.cos(PDAT_Angle)
-        distances[i] = PDAT_Distance
-        speeds[i] = PDAT_Speed
-        
-        i = i + 1
-        
-        # subtract stored datalen from payloadlen
-        length = length - 8
+    try:
+        # get data, until payloadlen is zero
+        while length > 0:
+            PDAT_Distance = np.frombuffer(com_obj.read(2), dtype=np.uint16)
+            PDAT_Speed = np.frombuffer(com_obj.read(2), dtype=np.int16)/100
+            PDAT_Angle = math.radians(np.frombuffer(com_obj.read(2), dtype=np.int16)/100)
+            PDAT_Magnitude = np.frombuffer(com_obj.read(2), dtype=np.uint16)
+            print(f"PDAT_Distance size {len(PDAT_Distance)}")
+            
+            distances_x[i] = -(PDAT_Distance * math.sin(PDAT_Angle))
+            distances_y[i] = PDAT_Distance * math.cos(PDAT_Angle)
+            distances[i] = PDAT_Distance
+            speeds[i] = PDAT_Speed
+            
+            i = i + 1
+            
+            # subtract stored datalen from payloadlen
+            length = length - 8
+    except Exception as e:
+        print(f"got error {e}")
+        # disconnect from sensor 
+        payloadlength = (0).to_bytes(4, byteorder='little')
+        header = bytes("GBYE", 'utf-8')
+        cmd_frame = header+payloadlength
+        com_obj.write(cmd_frame)
+
+        # get response
+        response_gbye = com_obj.read(9)
+        if response_gbye[8] != 0:
+            print("Error during disconnecting with K-LD7")
+
+
+# close connection to COM port 
+com_obj.close()
 
    # clear figure
     plt.clf()
