@@ -139,6 +139,7 @@ for ctr in range(100):
     fig.canvas.draw()
     fig.canvas.flush_events()
     
+
 # disconnect from sensor 
 payloadlength = (0).to_bytes(4, byteorder='little')
 header = bytes("GBYE", 'utf-8')

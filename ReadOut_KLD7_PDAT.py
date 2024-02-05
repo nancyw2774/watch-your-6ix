@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-COM_Port = 'COM5'
+COM_Port = '/dev/ttyAMA0'
 
 # create serial object with corresponding COM Port and open it 
 com_obj=serial.Serial(COM_Port)
