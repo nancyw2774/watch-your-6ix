@@ -11,7 +11,7 @@ class kld7_class:
             print(f"An error occurred while initializing the KLD7 radar: {e}")
 
 
-    def read(self):
+    def readout(self):
         try:
             detection_data = self.radar.read_DDAT()
             print("detection data")
@@ -19,9 +19,6 @@ class kld7_class:
             possible_targets = self.radar.read_PDAT()
             print("possible target data")
             print(possible_targets)
-            # raw_adc_frame = self.radar.read_RADC()
-            # print("raw adc data")
-            # print(raw_adc_frame)
         except KLD7Exception as e:
             print(f"KLD7 Exception: {e}")
         except Exception as e:
