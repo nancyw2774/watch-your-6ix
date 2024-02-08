@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-COM_Port = 'COM5'
+COM_Port = '/dev/ttyAMA0'
 
 # create serial object with corresponding COM Port and open it 
 com_obj=serial.Serial(COM_Port)
@@ -135,8 +135,8 @@ for ctr in range(100):
             print("Error during disconnecting with K-LD7")
 
 
-# close connection to COM port 
-com_obj.close()
+            # close connection to COM port 
+            com_obj.close()
 
    # clear figure
     plt.clf()
