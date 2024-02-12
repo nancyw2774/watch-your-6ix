@@ -144,7 +144,7 @@ for ctr in range(100):
     # plot speed/distance
     sub1 = plt.subplot(121)
     for j in range(np.count_nonzero(distances)):
-        point_Sub1, = sub1.plot(speeds[j],distances[j],marker='o',markersize=15,markerFaceColor='b',markerEdgeColor='k')
+        point_Sub1, = sub1.plot(speeds[j],distances[j],marker='o',markersize=15,markerfacecolor='b',markeredgecolor='k')
     
     plt.grid(True)
     plt.axis([-25, 25, 0, 1000])
@@ -157,9 +157,9 @@ for ctr in range(100):
     sub2 = plt.subplot(122)
     for y in range(np.count_nonzero(distances_x)):
         if speeds[y] > 0 :
-            point_Sub2, = sub2.plot(distances_x[y], distances_y[y],marker='o',markersize=15,markerFaceColor='g',markerEdgeColor='k')
+            point_Sub2, = sub2.plot(distances_x[y], distances_y[y],marker='o',markersize=15,markerfacecolor='g',markeredgecolor='k')
         else:
-            point_Sub2, = sub2.plot(distances_x[y], distances_y[y],marker='o',markersize=15,markerFaceColor='r',markerEdgeColor='k')
+            point_Sub2, = sub2.plot(distances_x[y], distances_y[y],marker='o',markersize=15,markerfacecolor='r',markeredgecolor='k')
        
     plt.grid(True)
     plt.axis([-500, 500, 0, 1000])
