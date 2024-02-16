@@ -50,10 +50,10 @@ def main():
     start_time = time.perf_counter()
     try:
         while time.perf_counter() - start_time < 5:
-            kld7_instance.read()
+            kld7_instance.readout()
     except Exception as e:
         print(f"Got exception {e}")
-    kld7_instance.close_connection()
+    kld7_instance.radar.close()
 
 if __name__ == "__main__":
     main()
