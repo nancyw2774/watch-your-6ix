@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-COM_Port = 'COM5'
+COM_Port = '/dev/ttyAMA0'
 
 # create serial object with corresponding COM Port and open it 
 com_obj=serial.Serial(COM_Port)
@@ -76,7 +76,7 @@ plt.show()
 
 # plot speed/distance
 sub1 = fig.add_subplot(121)
-point_sub1, = sub1.plot(0,0,'o',markersize=15,markerFaceColor='b',markerEdgeColor='k')
+point_sub1, = sub1.plot(0,0,'o',markersize=15,markerfacecolor='b',markeredgecolor='k')
 plt.grid(True)
 plt.axis([-25, 25, 0, 1000])
 plt.title('Distance / Speed')
@@ -85,7 +85,7 @@ plt.ylabel('Distance [cm]')
 
 # plot distance/distance
 sub2 = fig.add_subplot(122)
-point_sub2, = sub2.plot(0,0,'o',markersize=15,markerFaceColor='b',markerEdgeColor='k')
+point_sub2, = sub2.plot(0,0,'o',markersize=15,markerfacecolor='b',markeredgecolor='k')
 plt.grid(True)
 plt.axis([-500, 500, 0, 1000])
 plt.title('Distance / Distance \n (Green: Receding, Red: Approaching)')

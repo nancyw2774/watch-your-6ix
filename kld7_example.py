@@ -25,35 +25,20 @@ class kld7_class:
             print(f"An unexpected error occurred: {e}")
             print(traceback.format_exc())
 
-    # TODO: fix crashing on response from close command
-    def close_connection(self):
-        # disconnect from sensor 
-        payloadlength = (0).to_bytes(4, byteorder='little')
-        header = bytes("GBYE", 'utf-8')
-        cmd_frame = header+payloadlength
-        self.radar._port.write(cmd_frame)
-
-        # get response
-        try:
-            response_gbye = self.radar._port.read(9)
-        except Exception as e:
-            print(f"got exception {e}")
-        if response_gbye[8] != 0:
-            print('Error during disconnecting with K-LD7')
-
-        # close connection to COM port 
-        self.radar._port.close()
-
-
+#TODO: prevent crashing on connection close
 def main():
     kld7_instance = kld7_class()
     start_time = time.perf_counter()
     try:
         while time.perf_counter() - start_time < 5:
-            kld7_instance.read()
+            kld7_instance.readout()
     except Exception as e:
-        print(f"Got exception {e}")
-    kld7_instance.close_connection()
+        print(f"Got exception reading from radar: {e}")
+
+    try:
+        kld7_instance.radar.close()
+    except Exception as e:
+        print(f"Got exception closing connection: {e}")
 
 if __name__ == "__main__":
     main()
