@@ -18,7 +18,17 @@ class IMU:
         self._mag_q = deque([], maxlen=5)
         self._time_q = deque([], maxlen=5)
 
-    # run as thread to update values
+    # using moving window avg for basic filtering
+    def get_accel(self):
+        return sum(self._accel_q) / len(self._accel_q)
+
+    def get_gyro(self):
+        return sum(self._gyro_q) / len(self._gyro_q)
+
+    def get_mag(self):
+        return sum(self._mag_q) / len(self._mag_q)
+
+    # TODO: run as thread to update values
     def update_qs(self):
         x, y, z = self._conn.read_magnetometer_data()
         ax, ay, az, gx, gy, gz = self._conn.read_accelerometer_gyro_data()

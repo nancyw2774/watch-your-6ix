@@ -2,6 +2,11 @@ from kld7 import KLD7, KLD7Exception
 import time
 import traceback
 
+'''
+datasheet: https://rfbeam.ch/wp-content/uploads/dlm_uploads/2022/10/K-LD7_Datasheet.pdf
+library api: https://kld7.readthedocs.io/en/latest/API.html#data-types 
+'''
+
 class kld7_class:
 
     def __init__(self):
@@ -9,6 +14,7 @@ class kld7_class:
             self.radar = KLD7("/dev/ttyAMA0", baudrate=115200)
         except Exception as e:
             print(f"An error occurred while initializing the KLD7 radar: {e}")
+            # TODO: gracefully close
 
 
     def readout(self):
