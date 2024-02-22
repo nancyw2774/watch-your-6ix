@@ -1,6 +1,7 @@
 from kld7 import KLD7, KLD7Exception
 import time
 import traceback
+import subprocess
 
 '''
 datasheet: https://rfbeam.ch/wp-content/uploads/dlm_uploads/2022/10/K-LD7_Datasheet.pdf
@@ -9,12 +10,24 @@ library api: https://kld7.readthedocs.io/en/latest/API.html#data-types
 
 class kld7_class:
 
+    # radar set to None on failure to init
     def __init__(self):
+        self.radar = None
+        port = "/dev/ttyAMA0"
+        # self.radar = KLD7(port, baudrate=115200)
+        
         try:
-            self.radar = KLD7("/dev/ttyAMA0", baudrate=115200)
+            self.radar = KLD7(port, baudrate=115200)
         except Exception as e:
-            print(f"An error occurred while initializing the KLD7 radar: {e}")
-            # TODO: gracefully close
+            print(f"An unexpected error occurred while initializing the KLD7 radar: {e}")
+            
+            # see if granting permissions fixes issue (catching permission error directly is not working)
+            try:
+                print(f"Granting permissions for {port}")
+                subprocess.run(["sudo", "chmod", "g+r", "/dev/ttyAMA0"], check=True)
+                self.radar = KLD7(port, baudrate=115200)
+            except Exception as pe:
+                print(f"Error setting permissions for {port}: {pe}")
 
 
     def readout(self):
@@ -34,17 +47,11 @@ class kld7_class:
 #TODO: prevent crashing on connection close
 def main():
     kld7_instance = kld7_class()
-    start_time = time.perf_counter()
-    try:
+    if kld7_instance.radar is not None:
+        start_time = time.perf_counter()
         while time.perf_counter() - start_time < 5:
             kld7_instance.readout()
-    except Exception as e:
-        print(f"Got exception reading from radar: {e}")
-
-    try:
-        kld7_instance.radar.close()
-    except Exception as e:
-        print(f"Got exception closing connection: {e}")
+        # kld7_instance.radar.close()
 
 if __name__ == "__main__":
     main()
