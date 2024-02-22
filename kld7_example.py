@@ -14,17 +14,16 @@ class kld7_class:
     def __init__(self):
         self.radar = None
         port = "/dev/ttyAMA0"
-        # self.radar = KLD7(port, baudrate=115200)
         
         try:
             self.radar = KLD7(port, baudrate=115200)
         except Exception as e:
             print(f"An unexpected error occurred while initializing the KLD7 radar: {e}")
-            
+
             # see if granting permissions fixes issue (catching permission error directly is not working)
             try:
                 print(f"Granting permissions for {port}")
-                subprocess.run(["sudo", "chmod", "g+r", "/dev/ttyAMA0"], check=True)
+                subprocess.run(["sudo", "chmod", "g+r", port], check=True)
                 self.radar = KLD7(port, baudrate=115200)
             except Exception as pe:
                 print(f"Error setting permissions for {port}: {pe}")
@@ -51,7 +50,6 @@ def main():
         start_time = time.perf_counter()
         while time.perf_counter() - start_time < 5:
             kld7_instance.readout()
-        # kld7_instance.radar.close()
 
 if __name__ == "__main__":
     main()
