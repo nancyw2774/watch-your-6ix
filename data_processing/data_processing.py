@@ -55,3 +55,6 @@ def main():
                 print("hazard is really close")
                 continue
         #else: if bike is not moving, hazard when speed < -20
+
+if __name__ == "__main__":
+    main()
