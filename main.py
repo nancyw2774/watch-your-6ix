@@ -47,10 +47,12 @@ def trigger_event(level):
 
 @app.route('/has_hazard')
 def has_hazard():
-    success, im = cam.capture_array()
-    if not success:
-        return "Error: Camera read failed"
-    return str(yolo.hazrd_exists_instant(im))
+    try:
+        print("Capturing fram")
+        im = cam.capture_array()
+    except:
+        print("Error Capturing frame")
+    return str(yolo.hazrd_exists_instant(im)) if im != None else "False"
 
 @socketio.on('connect')
 def handle_connect():
