@@ -70,7 +70,7 @@ if __name__ == '__main__':
     yolo = Yolo()
     try:
         cam = Picamera2()
-        cam.start()
+        cam.capture_array()
         print("Camera initialized")
     except:
         print("Camera busy")
