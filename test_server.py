@@ -70,6 +70,13 @@ def send_notification(data):
     message = data.get('message', 'Default Notification')
     send({'message': message}, broadcast=True)
 
+@socketio.on('speed_data')
+def speed_data(data):
+    return data
+
+@socketio.on('request_speed')
+def request_speed(data):
+    socketio.emit('send_notification')
 
 
 socketio.run(app, host='0.0.0.0', port=5001, debug=True)
