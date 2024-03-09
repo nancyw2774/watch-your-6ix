@@ -9,6 +9,9 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 cam = None
 
+speed = 0
+speed_updated = False
+
 def gen_frames(): 
     start_time = time.time()
     while time.time() - start_time < 30:
@@ -68,6 +71,27 @@ def send_notification(data):
     message = data.get('message', 'Default Notification')
     send({'message': message}, broadcast=True)
 
+@socketio.on('speed_data')
+def speed_data(data):
+    global speed_updated, speed
+    speed_updated = True
+    speed = data
+
+@socketio.on('request_speed')
+def request_speed(data):
+    global speed_updated
+    speed_updated = False
+    socketio.emit('send_notification')
+
+def get_speed():
+    request_speed()
+    timeout = 5
+    start_time = time.perf_counter()
+    while True:
+        if time.perf_counter() - start_time > timeout:
+            return None
+        if speed_updated:
+            return speed
 
 if __name__ == '__main__':
     yolo = Yolo()

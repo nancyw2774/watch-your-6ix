@@ -11,6 +11,8 @@ socketio = SocketIO(app)
 yolo = Yolo()
 cam = cv2.VideoCapture(0)
 
+speed = 0
+speed_updated = False
 
 def gen_frames(): 
     start_time = time.time()
@@ -72,11 +74,26 @@ def send_notification(data):
 
 @socketio.on('speed_data')
 def speed_data(data):
-    return data
+    global speed_updated
+    global speed
+    speed_updated = True
+    speed = data
 
 @socketio.on('request_speed')
-def request_speed(data):
+def request_speed():
+    global speed_updated
+    speed_updated = False
     socketio.emit('send_notification')
+
+def get_speed():
+    request_speed()
+    timeout = 5
+    start_time = time.perf_counter()
+    while True:
+        if time.perf_counter() - start_time > timeout:
+            return None
+        if speed_updated:
+            return speed
 
 
 socketio.run(app, host='0.0.0.0', port=5001, debug=True)
