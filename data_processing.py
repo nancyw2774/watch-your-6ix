@@ -41,6 +41,15 @@ def main():
     while True:
         detection_data = sensor.read_TDAT()
         # outlining cases to take action
+        if detection_data.speed > 0:
+            continue
+        
+        hazard = detection_data.distance**2 - detection_data.speed**2
+        danger_level = 0
+        if hazard < 300:
+            danger_level = 1
+        if hazard < 100:
+            danger_level = 2
         #case 1: bike is moving, object detected
 
         # add bike speed if statement here

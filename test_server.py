@@ -74,11 +74,14 @@ def send_notification(data):
 
 @socketio.on('speed_data')
 def speed_data(data):
+    global speed_updated
+    global speed
     speed_updated = True
     speed = data
 
 @socketio.on('request_speed')
-def request_speed(data):
+def request_speed():
+    global speed_updated
     speed_updated = False
     socketio.emit('send_notification')
 
