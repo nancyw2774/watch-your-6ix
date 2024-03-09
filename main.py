@@ -47,10 +47,13 @@ def trigger_event(level):
 
 @app.route('/has_hazard')
 def has_hazard():
-    success, im = cam.read()
-    if not success:
-        return "Error: Camera read failed"
-    return str(yolo.hazrd_exists_instant(im))
+    try:
+        print("Capturing fram")
+        im = cam.capture_array()
+        return str(yolo.hazrd_exists_instant(im)) if im != None else "False"
+    except:
+        print("Error Capturing frame")
+    return False
 
 @socketio.on('connect')
 def handle_connect():
@@ -70,7 +73,7 @@ if __name__ == '__main__':
     yolo = Yolo()
     try:
         cam = Picamera2()
-        cam.capture_array()
+        cam.start()
         print("Camera initialized")
     except:
         print("Camera busy")
