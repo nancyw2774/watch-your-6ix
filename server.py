@@ -93,12 +93,11 @@ def get_speed():
         if speed_updated:
             return speed
 
-if __name__ == '__main__':
-    yolo = Yolo()
-    try:
-        cam = Picamera2()
-        cam.start()
-        print("Camera initialized")
-    except:
-        print("Camera busy")
-    socketio.run(app, host='0.0.0.0', port=5001, debug=False)
+yolo = Yolo()
+try:
+    cam = Picamera2()
+    cam.start()
+    print("Camera initialized")
+except:
+    print("Camera busy")
+socketio.run(app, host='0.0.0.0', port=5001, debug=False)
