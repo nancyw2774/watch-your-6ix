@@ -7,6 +7,7 @@ from object_detection import Yolo
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+cam = None
 
 def gen_frames(): 
     start_time = time.time()
@@ -73,4 +74,4 @@ if __name__ == '__main__':
         print("Camera initialized")
     except:
         print("Camera busy")
-    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=False)
