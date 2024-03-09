@@ -47,7 +47,7 @@ def trigger_event(level):
 
 @app.route('/has_hazard')
 def has_hazard():
-    success, im = cam.read()
+    success, im = cam.capture_array()
     if not success:
         return "Error: Camera read failed"
     return str(yolo.hazrd_exists_instant(im))
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     yolo = Yolo()
     try:
         cam = Picamera2()
-        cam.capture_array()
+        cam.start()
         print("Camera initialized")
     except:
         print("Camera busy")
