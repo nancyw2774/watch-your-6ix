@@ -4,20 +4,15 @@ from picamera2 import Picamera2
 import cv2
 import time
 from object_detection import Yolo
-from camera import Camera
 
 app = Flask(__name__)
 socketio = SocketIO(app)
-
-yolo = Yolo()
-cam = Camera()
+cam = None
 
 def gen_frames(): 
-    picam2 = Picamera2()
-    picam2.start()
     start_time = time.time()
     while time.time() - start_time < 30:
-        frame = picam2.capture_array()
+        frame = cam.capture_array()
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
@@ -29,9 +24,25 @@ app = Flask(__name__)
 def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/trigger_event')
-def test():
-    socketio.emit('send_notification', {'message': 'New Notification'})
+@app.route('/trigger_event/<int:level>')
+def trigger_event(level):
+    print(level)
+    if level == 1:
+        socketio.emit('send_notification', {'message': 'green', 'trafficLight': 1})
+    elif level == 2:
+        socketio.emit('send_notification', {'message': 'yellow', 'trafficLight': 2})
+    elif level == 3:
+        socketio.emit('send_notification', {'message': 'red', 'trafficLight': 3})
+    elif level == 0:
+        socketio.emit('send_notification', {'message': 'off', 'trafficLight': 0})
+    elif level == 4:
+        socketio.emit('send_notification', {'message': 'Enable Camera', 'trafficLight': 0})
+    elif level == 5:
+        socketio.emit('send_notification', {'message': 'Disable Camera', 'trafficLight': 0})
+    else:
+        socketio.emit('send_notification', {'message': 'New Notification', 'trafficLight': 0})
+    # socketio.emit('trigger_event')
+    print("done")
     return "Success"
 
 @app.route('/has_hazard')
@@ -56,4 +67,11 @@ def send_notification(data):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+    yolo = Yolo()
+    try:
+        cam = Picamera2()
+        cam.capture_array()
+        print("Camera initialized")
+    except:
+        print("Camera busy")
+    socketio.run(app, host='0.0.0.0', port=5001, debug=False)
