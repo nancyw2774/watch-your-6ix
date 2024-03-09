@@ -9,9 +9,6 @@ from camera import Camera
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-yolo = Yolo()
-cam = Camera()
-
 def gen_frames(): 
     picam2 = Picamera2()
     picam2.start()
@@ -72,4 +69,6 @@ def send_notification(data):
 
 
 if __name__ == '__main__':
+    yolo = Yolo()
+    cam = Camera()
     socketio.run(app, host='0.0.0.0', port=5001, debug=True)
