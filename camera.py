@@ -11,5 +11,5 @@ class Camera:
     def read(self):
         return self.cam.capture_array()
 
-#picam2 = Picamera2()
-#picam2.start_and_record_video("test.mp4", duration=5)
+picam2 = Camera()
+picam2.cam.start_and_record_video("test.mp4", duration=5)
