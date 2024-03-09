@@ -50,9 +50,10 @@ def has_hazard():
     try:
         print("Capturing fram")
         im = cam.capture_array()
+        return str(yolo.hazrd_exists_instant(im)) if im != None else "False"
     except:
         print("Error Capturing frame")
-    return str(yolo.hazrd_exists_instant(im)) if im != None else "False"
+    return False
 
 @socketio.on('connect')
 def handle_connect():
