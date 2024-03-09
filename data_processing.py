@@ -11,7 +11,7 @@ from kld7 import KLD7, KLD7Exception
 import time
 import traceback
 import subprocess
-import server
+import test_server
 
 class kld7_class:
 
@@ -41,12 +41,12 @@ def main():
     camera_on = False
 
     while True:
-        speed = server.get_speed()
+        # speed = test_server.get_speed()
         detection_data = sensor.read_TDAT()
         # outlining cases to take action
         if detection_data.speed > 0 and camera_on:
-            server.trigger_event(5)
-            server.trigger_event(0)
+            test_server.trigger_event(5)
+            test_server.trigger_event(0)
             camera_on = False
             continue
         
@@ -58,34 +58,52 @@ def main():
             danger_level = 3
         #case 1: bike is moving, object detected
         # add bike speed if statement here
-        if speed > 2:
-            if detection_data.speed < 0:
-                if detection_data.distance < 25: #max 25m distance to trigger alerts
-                    if server.has_hazard() == "True":
-                        server.trigger_event(danger_level)
-                        if not camera_on:
-                            server.trigger_event(4)
-                            camera_on = True
-                        continue
-            elif detection_data.distance < 10:
-                if server.has_hazard() == "True":
-                    server.trigger_event(danger_level)
-                    if not camera_on:
-                        server.trigger_event(4)
-                        camera_on = True
-                    continue
-        elif detection_data.speed < -20:
-            if server.has_hazard() == "True":
-                server.trigger_event(danger_level)
-                if not camera_on:
-                    server.trigger_event(4)
-                    camera_on = True
-                continue
+        # if speed > 2:
+        #     if detection_data.speed < 0:
+        #         if detection_data.distance < 25: #max 25m distance to trigger alerts
+        #             if server.has_hazard() == "True":
+        #                 server.trigger_event(danger_level)
+        #                 if not camera_on:
+        #                     server.trigger_event(4)
+        #                     camera_on = True
+        #                 continue
+        #     elif detection_data.distance < 10:
+        #         if server.has_hazard() == "True":
+        #             server.trigger_event(danger_level)
+        #             if not camera_on:
+        #                 server.trigger_event(4)
+        #                 camera_on = True
+        #             continue
+        # elif detection_data.speed < -20:
+        #     if server.has_hazard() == "True":
+        #         server.trigger_event(danger_level)
+        #         if not camera_on:
+        #             server.trigger_event(4)
+        #             camera_on = True
+        #         continue
         #else: if bike is not moving, hazard when speed < -20
         # no hazard condition, turn off lights and camera
-        server.trigger_event(5)
-        server.trigger_event(0)
-        camera_on = False
+            
+        # TEST
+        if detection_data.speed < 0:
+            if detection_data.distance < 2: 
+                if test_server.has_hazard() == "True":
+                    test_server.trigger_event(danger_level)
+                    if not camera_on:
+                        test_server.trigger_event(4)
+                        camera_on = True
+                    continue
+        elif detection_data.distance < 1:
+            if test_server.has_hazard() == "True":
+                test_server.trigger_event(danger_level)
+                if not camera_on:
+                    test_server.trigger_event(4)
+                    camera_on = True
+                continue
+        if camera_on:
+            test_server.trigger_event(5)
+            test_server.trigger_event(0)
+            camera_on = False
 
 if __name__ == "__main__":
     main()
