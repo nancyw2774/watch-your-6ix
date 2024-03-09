@@ -71,27 +71,27 @@ def send_notification(data):
     message = data.get('message', 'Default Notification')
     send({'message': message}, broadcast=True)
 
-@socketio.on('speed_data')
-def speed_data(data):
-    global speed_updated, speed
-    speed_updated = True
-    speed = data
+# @socketio.on('speed_data')
+# def speed_data(data):
+#     global speed_updated, speed
+#     speed_updated = True
+#     speed = data
 
-@socketio.on('request_speed')
-def request_speed(data):
-    global speed_updated
-    speed_updated = False
-    socketio.emit('send_notification')
+# @socketio.on('request_speed')
+# def request_speed():
+#     global speed_updated
+#     speed_updated = False
+#     socketio.emit('send_notification')
 
-def get_speed():
-    request_speed()
-    timeout = 5
-    start_time = time.perf_counter()
-    while True:
-        if time.perf_counter() - start_time > timeout:
-            return None
-        if speed_updated:
-            return speed
+# def get_speed():
+#     request_speed()
+#     timeout = 5
+#     start_time = time.perf_counter()
+#     while True:
+#         if time.perf_counter() - start_time > timeout:
+#             return None
+#         if speed_updated:
+#             return speed
 
 yolo = Yolo()
 try:

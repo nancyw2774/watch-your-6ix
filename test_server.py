@@ -4,12 +4,15 @@ from flask_socketio import SocketIO, send
 import cv2
 import time
 from object_detection import Yolo
+from picamera2 import Picamera2
+
+
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
 yolo = Yolo()
-cam = cv2.VideoCapture(0)
+cam = None
 
 speed = 0
 speed_updated = False
@@ -17,14 +20,11 @@ speed_updated = False
 def gen_frames(): 
     start_time = time.time()
     while time.time() - start_time < 300:
-        success, frame = cam.read()  # read the camera frame
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+        frame = cam.capture_array()  # read the camera frame
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
 
 @app.route('/video_feed')
@@ -54,10 +54,9 @@ def trigger_event(level):
 
 @app.route('/has_hazard')
 def has_hazard():
-    success, im = cam.read()
-    if not success:
-        return "Error: Camera read failed"
-    return str(yolo.hazrd_exists_instant(im))
+    im = cam.capture_array()
+
+    return str(yolo.hazrd_exists_instant(im[:, :, :3]))
 
 @socketio.on('connect')
 def handle_connect():
@@ -95,5 +94,12 @@ def get_speed():
         if speed_updated:
             return speed
 
+try:
+    cam = Picamera2()
+    cam.start()
+    print("Camera initialized")
+except:
+    print("Camera busy")
 
-socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+
+socketio.run(app, host='0.0.0.0', port=5001)
