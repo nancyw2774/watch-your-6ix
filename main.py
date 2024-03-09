@@ -10,6 +10,7 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 def gen_frames(): 
+    cam = Camera()
     cam.start()
     start_time = time.time()
     while time.time() - start_time < 30:
@@ -48,6 +49,7 @@ def trigger_event(level):
 
 @app.route('/has_hazard')
 def has_hazard():
+    cam = Camera()
     success, im = cam.read()
     if not success:
         return "Error: Camera read failed"
@@ -69,5 +71,4 @@ def send_notification(data):
 
 if __name__ == '__main__':
     yolo = Yolo()
-    cam = Camera()
     socketio.run(app, host='0.0.0.0', port=5001, debug=True)
