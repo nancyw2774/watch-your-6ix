@@ -29,9 +29,25 @@ app = Flask(__name__)
 def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/trigger_event')
-def test():
-    socketio.emit('send_notification', {'message': 'New Notification'})
+@app.route('/trigger_event/<int:level>')
+def trigger_event(level):
+    print(level)
+    if level == 1:
+        socketio.emit('send_notification', {'message': 'green', 'trafficLight': 1})
+    elif level == 2:
+        socketio.emit('send_notification', {'message': 'yellow', 'trafficLight': 2})
+    elif level == 3:
+        socketio.emit('send_notification', {'message': 'red', 'trafficLight': 3})
+    elif level == 0:
+        socketio.emit('send_notification', {'message': 'off', 'trafficLight': 0})
+    elif level == 4:
+        socketio.emit('send_notification', {'message': 'Enable Camera', 'trafficLight': 0})
+    elif level == 5:
+        socketio.emit('send_notification', {'message': 'Disable Camera', 'trafficLight': 0})
+    else:
+        socketio.emit('send_notification', {'message': 'New Notification', 'trafficLight': 0})
+    # socketio.emit('trigger_event')
+    print("done")
     return "Success"
 
 @app.route('/has_hazard')
