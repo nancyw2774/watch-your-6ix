@@ -120,7 +120,6 @@ def main():
             except requests.RequestException as e:
                 print(e)
         else:
-            print("not moving")
             if detection_data.distance >= 1:
                 pass
 
@@ -167,7 +166,7 @@ def try_request(url, endpoint, parameter = ""):
     except requests.RequestException as e:
         print(e)
         return False
-    return
+    return True
 
 def get_danger_level(distance, speed):
     hazard = distance**2 - speed**2
