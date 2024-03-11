@@ -60,9 +60,66 @@ def main():
             danger_level = 3
         #case 1: bike is moving, object detected
         # add bike speed if statement here
-        if speed > 2:
+        # if speed > 2:
+        #     if detection_data.speed < 0:
+        #         if detection_data.distance < 25: #max 25m distance to trigger alerts
+        #             try:
+        #                 hazard = requests.get(url+"/has_hazard")
+        #                 if hazard.code == 200 and hazard.text == "True":
+        #                     try:
+        #                         event = requests.get(url+"/trigger_event/"+str(danger_level))
+        #                     except requests.RequestException as e:
+        #                         print(e)
+        #                     if not camera_on:
+        #                         try:
+        #                             event = requests.get(url+"/trigger_event/4")
+        #                             camera_on = True
+        #                         except requests.RequestException as e:
+        #                             print(e)
+        #                     continue
+        #             except requests.RequestException as e:
+        #                 print(e)
+        #     elif detection_data.distance < 10:
+        #         try:
+        #             hazard = requests.get(url+"/has_hazard")
+        #             if hazard.code == 200 and hazard.text == "True":
+        #                 try:
+        #                     event = requests.get(url+"/trigger_event/"+str(danger_level))
+        #                 except requests.RequestException as e:
+        #                     print(e)
+        #                 if not camera_on:
+        #                     try:
+        #                         event = requests.get(url+"/trigger_event/4")
+        #                         camera_on = True
+        #                     except requests.RequestException as e:
+        #                         print(e)
+        #                 continue
+        #         except requests.RequestException as e:
+        #             print(e)
+        # elif detection_data.speed < -20:
+        #     try:
+        #         hazard = requests.get(url+"/has_hazard")
+        #         if hazard.code == 200 and hazard.text == "True":
+        #             try:
+        #                 event = requests.get(url+"/trigger_event/"+str(danger_level))
+        #             except requests.RequestException as e:
+        #                 print(e)
+        #             if not camera_on:
+        #                 try:
+        #                     event = requests.get(url+"/trigger_event/4")
+        #                     camera_on = True
+        #                 except requests.RequestException as e:
+        #                     print(e)
+        #             continue
+        #     except requests.RequestException as e:
+        #         print(e)
+        #else: if bike is not moving, hazard when speed < -20
+        # no hazard condition, turn off lights and camera
+        # TEST
+        mock_speed = server.get_mock()
+        if mock_speed != 0:
             if detection_data.speed < 0:
-                if detection_data.distance < 25: #max 25m distance to trigger alerts
+                if detection_data.distance < 2:
                     try:
                         hazard = requests.get(url+"/has_hazard")
                         if hazard.code == 200 and hazard.text == "True":
@@ -79,7 +136,8 @@ def main():
                             continue
                     except requests.RequestException as e:
                         print(e)
-            elif detection_data.distance < 10:
+        else:
+            if detection_data.distance < 1:
                 try:
                     hazard = requests.get(url+"/has_hazard")
                     if hazard.code == 200 and hazard.text == "True":
@@ -96,61 +154,6 @@ def main():
                         continue
                 except requests.RequestException as e:
                     print(e)
-        elif detection_data.speed < -20:
-            try:
-                hazard = requests.get(url+"/has_hazard")
-                if hazard.code == 200 and hazard.text == "True":
-                    try:
-                        event = requests.get(url+"/trigger_event/"+str(danger_level))
-                    except requests.RequestException as e:
-                        print(e)
-                    if not camera_on:
-                        try:
-                            event = requests.get(url+"/trigger_event/4")
-                            camera_on = True
-                        except requests.RequestException as e:
-                            print(e)
-                    continue
-            except requests.RequestException as e:
-                print(e)
-        #else: if bike is not moving, hazard when speed < -20
-        # no hazard condition, turn off lights and camera
-        # TEST
-        if detection_data.speed < 0:
-            if detection_data.distance < 2:
-                try:
-                    hazard = requests.get(url+"/has_hazard")
-                    if hazard.code == 200 and hazard.text == "True":
-                        try:
-                            event = requests.get(url+"/trigger_event/"+str(danger_level))
-                        except requests.RequestException as e:
-                            print(e)
-                        if not camera_on:
-                            try:
-                                event = requests.get(url+"/trigger_event/4")
-                                camera_on = True
-                            except requests.RequestException as e:
-                                print(e)
-                        continue
-                except requests.RequestException as e:
-                    print(e)
-        elif detection_data.distance < 1:
-            try:
-                hazard = requests.get(url+"/has_hazard")
-                if hazard.code == 200 and hazard.text == "True":
-                    try:
-                        event = requests.get(url+"/trigger_event/"+str(danger_level))
-                    except requests.RequestException as e:
-                        print(e)
-                    if not camera_on:
-                        try:
-                            event = requests.get(url+"/trigger_event/4")
-                            camera_on = True
-                        except requests.RequestException as e:
-                            print(e)
-                    continue
-            except requests.RequestException as e:
-                print(e)
         if camera_on:
             try:
                 event = requests.get(url+"/trigger_event/5")
