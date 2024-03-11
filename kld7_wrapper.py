@@ -8,7 +8,7 @@ datasheet: https://rfbeam.ch/wp-content/uploads/dlm_uploads/2022/10/K-LD7_Datash
 library api: https://kld7.readthedocs.io/en/latest/API.html#data-types 
 '''
 
-class kld7_class:
+class kld7_wrapper:
 
     # radar set to None on failure to init
     def __init__(self):
@@ -17,6 +17,7 @@ class kld7_class:
         
         try:
             self.radar = KLD7(port, baudrate=115200)
+            self.setup()
         except Exception as e:
             print(f"An unexpected error occurred while initializing the KLD7 radar: {e}")
 
@@ -27,6 +28,7 @@ class kld7_class:
                 self.radar = KLD7(port, baudrate=115200)
             except Exception as pe:
                 print(f"Error setting permissions for {port}: {pe}")
+                raise
 
     def setup(self):
         self.radar.set_param("RSPI", 3) # Maximum speed. 0=12.5km/h, 1=25km/h, 2=50km/h, 3=100km/h
@@ -80,7 +82,7 @@ class kld7_class:
 
 #TODO: prevent crashing on connection close
 def main():
-    kld7_instance = kld7_class()
+    kld7_instance = kld7_wrapper()
     if kld7_instance.radar is not None:
         start_time = time.perf_counter()
         while time.perf_counter() - start_time < 5:
