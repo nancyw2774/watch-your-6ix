@@ -57,6 +57,21 @@ def has_hazard():
 
     return str(yolo.hazrd_exists_instant(im[:, :, :3]))
 
+@app.route('/request_speed')
+def request_speed():
+    global speed_updated
+    speed_updated = False
+    socketio.emit('request_speed', {'message': 'Requesting speed data'})
+    return "Success"
+
+@app.route('/get_speed')
+def get_speed():
+    global speed
+    global speed_updated
+    if speed_updated:
+        return str(speed)
+    return "Speed Not Updated"
+
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
@@ -76,22 +91,6 @@ def speed_data(data):
     global speed
     speed_updated = True
     speed = data
-
-@socketio.on('request_speed')
-def request_speed():
-    global speed_updated
-    speed_updated = False
-    socketio.emit('send_notification')
-
-def get_speed():
-    request_speed()
-    timeout = 5
-    start_time = time.perf_counter()
-    while True:
-        if time.perf_counter() - start_time > timeout:
-            return None
-        if speed_updated:
-            return speed
 
 try:
     cam = Picamera2()
