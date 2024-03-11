@@ -25,7 +25,11 @@ def main():
         # speed = test_server.get_speed()
         detection_data = radar.read_TDAT()
         if detection_data == None:
-            time.sleep(0.05)
+            if camera_on:
+                try_request(url, "trigger_event", "5")
+                try_request(url, "trigger_event", "0")
+                camera_on = False
+            time.sleep(0.1)
             continue
         # # outlining cases to take action
         # if detection_data.speed > 0 and camera_on:
@@ -108,13 +112,15 @@ def main():
                 
                 try_request(url, "trigger_event", str(danger_level))
 
-                if not camera_on:
-                    if try_request(url, "trigger_event", "4"):
-                        camera_on = True
-                continue
+                if danger_level > 1:
+                    if not camera_on:
+                        if try_request(url, "trigger_event", "4"):
+                            camera_on = True
+                    continue
             except requests.RequestException as e:
                 print(e)
         else:
+            print("not moving")
             if detection_data.distance >= 1:
                 pass
 
@@ -127,10 +133,11 @@ def main():
                 
                 try_request(url, "trigger_event", str(danger_level))
 
-                if not camera_on:
-                    if try_request(url, "trigger_event", "4"):
-                        camera_on = True
-                continue
+                if danger_level > 1:
+                    if not camera_on:
+                        if try_request(url, "trigger_event", "4"):
+                            camera_on = True
+                    continue
             except requests.RequestException as e:
                 print(e)
 
@@ -138,6 +145,7 @@ def main():
             try_request(url, "trigger_event", "5")
             try_request(url, "trigger_event", "0")
             camera_on = False
+        time.sleep(2)
 
 def get_speed(url):
     requests.get(url+"/request_speed")
@@ -148,7 +156,7 @@ def get_speed(url):
         response = requests.get(url+"/get_speed")
         if response.text != "Speed Not Updated":
             return int(response.text)
-        time.sleep(0.01)
+        time.sleep(0.5)
 
     return None
 
