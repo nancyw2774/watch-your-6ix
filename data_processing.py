@@ -17,7 +17,7 @@ def main():
     '''
     setup input sources
     '''
-    url = "http://10.0.0.108:5001"
+    url = "http://172.20.10.2:5001"
     radar = kld7_wrapper().radar
     camera_on = False
 
@@ -154,7 +154,7 @@ def get_speed(url):
     while (time.perf_counter()-start_time) < timeout:
         response = requests.get(url+"/get_speed")
         if response.text != "Speed Not Updated":
-            return int(response.text)
+            return float(response.text)
         time.sleep(0.5)
 
     return None
