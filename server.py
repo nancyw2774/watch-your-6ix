@@ -87,6 +87,8 @@ def send_notification(data):
 
 @socketio.on('speed_data')
 def speed_data(data):
+    print("Receiving speed data")
+    print(data)
     global speed_updated
     global speed
     speed_updated = True

@@ -10,7 +10,6 @@ import time
 import time
 import traceback
 import os.path
-import server
 import requests
 from kld7_wrapper import kld7_wrapper
 
@@ -25,6 +24,9 @@ def main():
     while True:
         # speed = test_server.get_speed()
         detection_data = radar.read_TDAT()
+        if detection_data == None:
+            time.sleep(0.05)
+            continue
         # # outlining cases to take action
         # if detection_data.speed > 0 and camera_on:
         #     server.trigger_event(5)
@@ -142,11 +144,11 @@ def get_speed(url):
 
     timeout = 5
     start_time = time.perf_counter()
-    while time.perf_counter-start_time < timeout:
+    while (time.perf_counter()-start_time) < timeout:
         response = requests.get(url+"/get_speed")
-        if response != "Speed Not Updated":
-            return int(response)
-        time.sleep(10)
+        if response.text != "Speed Not Updated":
+            return int(response.text)
+        time.sleep(0.01)
 
     return None
 
