@@ -91,7 +91,8 @@ def main():
         # no hazard condition, turn off lights and camera
 
         # TEST
-        mock_speed = server.get_mock()
+        # mock_speed = server.get_mock()
+        mock_speed = get_speed(url)
         if mock_speed != 0:
             if detection_data.speed >= 0 or detection_data.distance > 2:
                 pass
@@ -135,6 +136,19 @@ def main():
             try_request(url, "trigger_event", "5")
             try_request(url, "trigger_event", "0")
             camera_on = False
+
+def get_speed(url):
+    requests.get(url+"/request_speed")
+
+    timeout = 5
+    start_time = time.perf_counter()
+    while time.perf_counter-start_time < timeout:
+        response = requests.get(url+"/get_speed")
+        if response != "Speed Not Updated":
+            return int(response)
+        time.sleep(10)
+
+    return None
 
 # returns success
 def try_request(url, endpoint, parameter = ""):
