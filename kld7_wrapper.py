@@ -24,7 +24,7 @@ class kld7_wrapper:
             # see if granting permissions fixes issue (catching permission error directly is not working)
             try:
                 print(f"Granting permissions for {port}")
-                subprocess.run(["sudo", "chmod", "g+r+w", port], check=True)
+                subprocess.run(["sudo", "chmod", "a+rw", port], check=True)
                 self.radar = KLD7(port, baudrate=115200)
             except Exception as pe:
                 print(f"Error setting permissions for {port}: {pe}")
