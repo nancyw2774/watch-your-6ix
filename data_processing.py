@@ -22,6 +22,7 @@ def main():
     print(url)
     radar = kld7_wrapper().radar
     camera_on = False
+    test_mode = True
 
     while True:
         try:
@@ -39,7 +40,7 @@ def main():
             continue
 
         print("detection")
-        if True: #hazard_check_required(target_data, url, close_range = False):
+        if hazard_check_required(target_data, url, test_mode):
             try:
                 hazard = requests.get(url+"/has_hazard")
             except requests.RequestException as e:
@@ -49,13 +50,13 @@ def main():
             
             if hazard.status_code == 200 and hazard.text == "True":
                 try:
-                    danger_level = get_danger_level(target_data.distance, target_data.speed)
+                    danger_level = get_danger_level(target_data.distance, target_data.speed, test_mode)
                 except Exception as e:
                     print(e)
                     continue
                 try_request(url, "trigger_event", str(danger_level))
 
-                if True:#danger_level > 1:
+                if danger_level > 0:
                     if not camera_on:
                         turned_on_camera = try_request(url, "trigger_event", "4")
                         if turned_on_camera:
@@ -67,21 +68,21 @@ def main():
             try_request(url, "trigger_event", "5")
             try_request(url, "trigger_event", "0")
             camera_on = False
-        time.sleep(2)
+        time.sleep(0.1)
 
-def hazard_check_required(target_data: Target, url, close_range = False):   
+def hazard_check_required(target_data: Target, url, test = False):   
     # mock_speed = server.get_mock()
     bike_speed = get_speed(url)
     if bike_speed is None: # TODO: potentially add error handling? for now skip on timeout
         return False
     
-    if close_range:
+    if test:
         return hazard_check_close(target_data, bike_speed)
     return hazard_check_far(target_data, bike_speed)
 
 def hazard_check_close(target_data: Target, bike_speed): 
     if bike_speed == 0:
-        if target_data.distance < 3:
+        if target_data.distance < 5:
             return True
     else:
         if target_data.speed < 0 or target_data.distance < 10:
@@ -90,6 +91,7 @@ def hazard_check_close(target_data: Target, bike_speed):
     return False
 
 def hazard_check_far(target_data: Target, bike_speed):
+    return True # TODO: tune
     # outlining cases to take action
     if target_data.speed > 0:
         return False
@@ -118,7 +120,7 @@ def hazard_check_far(target_data: Target, bike_speed):
     #     elif target_data.distance < 10: # TODO: This case is never reached?
     #         return True
     # # case 2: if bike is not moving, hazard when speed < -20
-    # elif target_data.speed < -20:
+    # elif target_d1ata.speed < -20:
     #     return True
     
     # return False
@@ -145,14 +147,24 @@ def try_request(url, endpoint, parameter = ""):
         return False
     return True
 
-def get_danger_level(distance, target_speed):
-    hazard = distance**2 - target_speed**2
-    
-    if hazard < 300:
-        return 2
-    if hazard < 100:
-        return 3
-    return 1
+def get_danger_level(target_distance, target_speed, test = False):
+    if test:
+        if target_distance < 2:
+            return 3
+        if target_distance < 3:
+            return 2
+        if target_distance < 4:
+            return 1
+        return 0
+    else:
+        return 2 # TODO: tune
+        hazard = target_distance**2 - target_speed**2
+        
+        if hazard < 300:
+            return 2
+        if hazard < 100:
+            return 3
+        return 1
 
 if __name__ == "__main__":
     main()
