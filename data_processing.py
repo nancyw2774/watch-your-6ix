@@ -11,12 +11,15 @@ import time
 import requests
 from kld7_wrapper import kld7_wrapper
 from kld7 import Target
+import subprocess
 
 def main():
     '''
     setup input sources
     '''
-    url = "http://172.20.10.2:5001"
+    result = subprocess.run(['hostname', '-I'], capture_output=True, text=True)
+    url = "http://" + result.stdout.split()[0] + ":5001"
+    print(url)
     radar = kld7_wrapper().radar
     camera_on = False
 
