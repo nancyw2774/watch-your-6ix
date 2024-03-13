@@ -16,7 +16,7 @@ class Yolo():
             boxes = r.boxes
 
             for box in boxes:
-                if int(box.cls[0]) >= 2 and int(box.cls[0]) < len(self.class_names):
+                if int(box.cls[0]) >= 0 and int(box.cls[0]) < len(self.class_names):
 
                     if debug:
                         # bounding box

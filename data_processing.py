@@ -23,6 +23,7 @@ def main():
     while True:
         target_data = radar.read_TDAT()
         if target_data is None:
+            print("no detection")
             if camera_on:
                 try_request(url, "trigger_event", "5")
                 try_request(url, "trigger_event", "0")
@@ -36,12 +37,14 @@ def main():
             except requests.RequestException as e:
                 print(e)
                 continue
+            print(f"hazard text: {hazard.text}")
             
             if hazard.status_code == 200 and hazard.text == "True":
                 danger_level = get_danger_level(target_data.distance, target_data.speed)
                 try_request(url, "trigger_event", str(danger_level))
 
-                if danger_level > 1:
+                if True:#danger_level > 1:
+                    print("danger level > 1")
                     if not camera_on:
                         turned_on_camera = try_request(url, "trigger_event", "4")
                         if turned_on_camera:
@@ -57,31 +60,31 @@ def main():
 
 def hazard_check_required(target_data: Target, url, close_range = False):   
     # mock_speed = server.get_mock()
-    speed = get_speed(url)
-    if speed is None: # TODO: potentially add error handling? for now skip on timeout
+    bike_speed = get_speed(url)
+    if bike_speed is None: # TODO: potentially add error handling? for now skip on timeout
         return False
     
     if close_range:
-        return hazard_check_close(target_data, speed)
-    return hazard_check_far(target_data, speed)
+        return hazard_check_close(target_data, bike_speed)
+    return hazard_check_far(target_data, bike_speed)
 
-def hazard_check_close(target_data: Target, speed): 
-    if speed == 0:
-        if target_data.distance < 1:
+def hazard_check_close(target_data: Target, bike_speed): 
+    if bike_speed == 0:
+        if target_data.distance < 3:
             return True
     else:
-        if target_data.speed < 0 or target_data.distance < 2:
+        if target_data.speed < 0 or target_data.distance < 10:
             return True
         
     return False
 
-def hazard_check_far(target_data: Target, speed):
+def hazard_check_far(target_data: Target, bike_speed):
     # outlining cases to take action
     if target_data.speed > 0:
         return False
     
     # case 1: bike is moving
-    if speed > 2:
+    if bike_speed > 2:
         # max 25m distance to trigger alerts
         if target_data.speed < 0:
             if target_data.distance < 25: 
@@ -116,8 +119,8 @@ def try_request(url, endpoint, parameter = ""):
         return False
     return True
 
-def get_danger_level(distance, speed):
-    hazard = distance**2 - speed**2
+def get_danger_level(distance, target_speed):
+    hazard = distance**2 - target_speed**2
     
     if hazard < 300:
         return 2
