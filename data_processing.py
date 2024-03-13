@@ -86,16 +86,31 @@ def hazard_check_far(target_data: Target, bike_speed):
     # case 1: bike is moving
     if bike_speed > 2:
         # max 25m distance to trigger alerts
-        if target_data.speed < 0:
-            if target_data.distance < 25: 
-                return True
-        elif target_data.distance < 10: # TODO: This case is never reached?
+        if target_data.distance < 25: 
             return True
     # case 2: if bike is not moving, hazard when speed < -20
     elif target_data.speed < -20:
         return True
     
     return False
+
+    # # outlining cases to take action
+    # if target_data.speed > 0:
+    #     return False
+    
+    # # case 1: bike is moving
+    # if bike_speed > 2:
+    #     # max 25m distance to trigger alerts
+    #     if target_data.speed < 0:
+    #         if target_data.distance < 25: 
+    #             return True
+    #     elif target_data.distance < 10: # TODO: This case is never reached?
+    #         return True
+    # # case 2: if bike is not moving, hazard when speed < -20
+    # elif target_data.speed < -20:
+    #     return True
+    
+    # return False
 
 def get_speed(url):
     requests.get(url+"/request_speed")
