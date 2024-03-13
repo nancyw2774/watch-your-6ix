@@ -16,12 +16,16 @@ def main():
     '''
     setup input sources
     '''
-    url = "http://10.0.0.108:5001"
+    url = "http://172.20.10.2:5001"
     radar = kld7_wrapper().radar
     camera_on = False
 
     while True:
-        target_data = radar.read_TDAT()
+        try:
+            target_data = radar.read_TDAT()
+        except Exception as e:
+            print(e)
+            continue
         if target_data is None:
             print("no detection")
             if camera_on:
@@ -31,7 +35,8 @@ def main():
             time.sleep(0.1)
             continue
 
-        if hazard_check_required(target_data, url, close_range = True):
+        print("detection")
+        if True: #hazard_check_required(target_data, url, close_range = False):
             try:
                 hazard = requests.get(url+"/has_hazard")
             except requests.RequestException as e:
@@ -40,11 +45,14 @@ def main():
             print(f"hazard text: {hazard.text}")
             
             if hazard.status_code == 200 and hazard.text == "True":
-                danger_level = get_danger_level(target_data.distance, target_data.speed)
+                try:
+                    danger_level = get_danger_level(target_data.distance, target_data.speed)
+                except Exception as e:
+                    print(e)
+                    continue
                 try_request(url, "trigger_event", str(danger_level))
 
                 if True:#danger_level > 1:
-                    print("danger level > 1")
                     if not camera_on:
                         turned_on_camera = try_request(url, "trigger_event", "4")
                         if turned_on_camera:
@@ -86,7 +94,7 @@ def hazard_check_far(target_data: Target, bike_speed):
     # case 1: bike is moving
     if bike_speed > 2:
         # max 25m distance to trigger alerts
-        if target_data.distance < 25: 
+        if target_data.distance < 30: 
             return True
     # case 2: if bike is not moving, hazard when speed < -20
     elif target_data.speed < -20:
@@ -115,7 +123,7 @@ def hazard_check_far(target_data: Target, bike_speed):
 def get_speed(url):
     requests.get(url+"/request_speed")
 
-    timeout = 5
+    timeout = 2
     start_time = time.perf_counter()
     while (time.perf_counter()-start_time) < timeout:
         response = requests.get(url+"/get_speed")
