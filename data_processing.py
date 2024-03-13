@@ -16,7 +16,7 @@ def main():
     '''
     setup input sources
     '''
-    url = "http://172.20.10.2:5001"
+    url = "http://10.0.0.108:5001"
     radar = kld7_wrapper().radar
     camera_on = False
 
@@ -30,7 +30,7 @@ def main():
             time.sleep(0.1)
             continue
 
-        if hazard_check_required(target_data, url):
+        if hazard_check_required(target_data, url, close_range = True):
             try:
                 hazard = requests.get(url+"/has_hazard")
             except requests.RequestException as e:
@@ -62,8 +62,8 @@ def hazard_check_required(target_data: Target, url, close_range = False):
         return False
     
     if close_range:
-        return hazard_check_close(target_data, url, speed)
-    return hazard_check_far(target_data, url, speed)
+        return hazard_check_close(target_data, speed)
+    return hazard_check_far(target_data, speed)
 
 def hazard_check_close(target_data: Target, speed): 
     if speed == 0:
