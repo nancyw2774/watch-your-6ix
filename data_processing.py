@@ -19,7 +19,6 @@ def main():
     '''
     result = subprocess.run(['hostname', '-I'], capture_output=True, text=True)
     url = "http://" + result.stdout.split()[0] + ":5001"
-    print(url)
     radar = kld7_wrapper().radar
     camera_on = False
     test_mode = True
@@ -58,9 +57,7 @@ def main():
 
                 if danger_level > 0:
                     if not camera_on:
-                        turned_on_camera = try_request(url, "trigger_event", "4")
-                        if turned_on_camera:
-                            camera_on = True
+                        camera_on = try_request(url, "trigger_event", "4")
                     continue
 
         # no hazard condition, turn off lights and camera
@@ -70,8 +67,7 @@ def main():
             camera_on = False
         time.sleep(0.1)
 
-def hazard_check_required(target_data: Target, url, test = False):   
-    # mock_speed = server.get_mock()
+def hazard_check_required(target_data: Target, url, test = False):
     bike_speed = get_speed(url)
     if bike_speed is None: # TODO: potentially add error handling? for now skip on timeout
         return False
@@ -128,7 +124,7 @@ def hazard_check_far(target_data: Target, bike_speed):
 def get_speed(url):
     requests.get(url+"/request_speed")
 
-    timeout = 1
+    timeout = 0.5
     start_time = time.perf_counter()
     while (time.perf_counter()-start_time) < timeout:
         response = requests.get(url+"/get_speed")
