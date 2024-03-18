@@ -69,8 +69,8 @@ def main():
 
 def hazard_check_required(target_data: Target, url, test = False):
     bike_speed = get_speed(url)
-    if bike_speed is None: # TODO: potentially add error handling? for now skip on timeout
-        return False
+    if bike_speed is None: # TODO: potentially add error handling? for now assume not moving
+        bike_speed = 0
     
     if test:
         return hazard_check_close(target_data, bike_speed)
@@ -87,8 +87,7 @@ def hazard_check_close(target_data: Target, bike_speed):
     return False
 
 def hazard_check_far(target_data: Target, bike_speed):
-    return True # TODO: tune
-    # outlining cases to take action
+    # target receding
     if target_data.speed > 0:
         return False
     
@@ -102,24 +101,6 @@ def hazard_check_far(target_data: Target, bike_speed):
         return True
     
     return False
-
-    # # outlining cases to take action
-    # if target_data.speed > 0:
-    #     return False
-    
-    # # case 1: bike is moving
-    # if bike_speed > 2:
-    #     # max 25m distance to trigger alerts
-    #     if target_data.speed < 0:
-    #         if target_data.distance < 25: 
-    #             return True
-    #     elif target_data.distance < 10: # TODO: This case is never reached?
-    #         return True
-    # # case 2: if bike is not moving, hazard when speed < -20
-    # elif target_d1ata.speed < -20:
-    #     return True
-    
-    # return False
 
 def get_speed(url):
     requests.get(url+"/request_speed")
@@ -153,14 +134,13 @@ def get_danger_level(target_distance, target_speed, test = False):
             return 1
         return 0
     else:
-        return 2 # TODO: tune
         hazard = target_distance**2 - target_speed**2
-        
-        if hazard < 300:
+
+        if hazard > 300:
+            return 1
+        if hazard > -10:
             return 2
-        if hazard < 100:
-            return 3
-        return 1
+        return 3
 
 if __name__ == "__main__":
     main()
