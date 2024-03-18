@@ -7,13 +7,19 @@ constant loop that monitors incoming data and determines whether a threat is det
 when a hazard condition is satisfied, call external function to call CV + send info to phone
 '''
 import time
-import time
 import requests
 from kld7_wrapper import kld7_wrapper
 from kld7 import Target
 import subprocess
+import asyncio
+import aiohttp
 
-def main():
+async def fetch_hazard_status(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url + "/has_hazard") as response:
+            return await response.text()
+
+async def main():
     '''
     setup input sources
     '''
@@ -22,8 +28,16 @@ def main():
     radar = kld7_wrapper().radar
     camera_on = False
     test_mode = True
+    last_hazard_check_time = time.time() - 10
+    hazard_check_delay = 3
+    hazard = False
 
     while True:
+        if time.time() - last_hazard_check_time > hazard_check_delay:
+            print("Getting data")
+            last_hazard_check_time = time.time()
+            hazard = await fetch_hazard_status(url)
+            speed_request = await fetch_requst_speed(url)
         try:
             target_data = radar.read_TDAT()
         except Exception as e:
@@ -39,15 +53,11 @@ def main():
             continue
 
         print("detection")
+
         if hazard_check_required(target_data, url, test_mode):
-            try:
-                hazard = requests.get(url+"/has_hazard")
-            except requests.RequestException as e:
-                print(e)
-                continue
-            print(f"hazard text: {hazard.text}")
+            print(f"hazard text: {hazard}")
             
-            if hazard.status_code == 200 and hazard.text == "True":
+            if hazard == "True":
                 try:
                     danger_level = get_danger_level(target_data.distance, target_data.speed, test_mode)
                 except Exception as e:
@@ -121,16 +131,15 @@ def hazard_check_far(target_data: Target, bike_speed):
     
     # return False
 
-def get_speed(url):
-    requests.get(url+"/request_speed")
+async def fetch_requst_speed(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url + "/request_speed") as response:
+            return await response.text()
 
-    timeout = 0.5
-    start_time = time.perf_counter()
-    while (time.perf_counter()-start_time) < timeout:
-        response = requests.get(url+"/get_speed")
-        if response.text != "Speed Not Updated":
-            return float(response.text)
-        time.sleep(0.1)
+def get_speed(url):
+    response = requests.get(url+"/get_speed")
+    if response.text != "Speed Not Updated":
+        return float(response.text)
 
     return 0
 
@@ -163,4 +172,4 @@ def get_danger_level(target_distance, target_speed, test = False):
         return 1
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
