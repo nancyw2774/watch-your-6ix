@@ -10,7 +10,7 @@ class Yolo():
         self.class_names = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck"]
     
     def hazrd_exists_instant(self, im, debug=False):
-        results = self.model(im, stream=True)
+        results = self.model(im, stream=False)
 
         for r in results:
             boxes = r.boxes
