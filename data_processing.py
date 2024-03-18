@@ -128,15 +128,15 @@ def hazard_check_far(target_data: Target, bike_speed):
 def get_speed(url):
     requests.get(url+"/request_speed")
 
-    timeout = 2
+    timeout = 1
     start_time = time.perf_counter()
     while (time.perf_counter()-start_time) < timeout:
         response = requests.get(url+"/get_speed")
         if response.text != "Speed Not Updated":
             return float(response.text)
-        time.sleep(0.5)
+        time.sleep(0.1)
 
-    return None
+    return 0
 
 # returns success
 def try_request(url, endpoint, parameter = ""):
@@ -149,11 +149,11 @@ def try_request(url, endpoint, parameter = ""):
 
 def get_danger_level(target_distance, target_speed, test = False):
     if test:
-        if target_distance < 2:
+        if target_distance < 0.5:
             return 3
-        if target_distance < 3:
+        if target_distance < 1:
             return 2
-        if target_distance < 4:
+        if target_distance < 1.5:
             return 1
         return 0
     else:
