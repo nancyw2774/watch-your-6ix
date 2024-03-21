@@ -39,6 +39,7 @@ async def main():
         except Exception as e:
             print(e)
             continue
+        time.sleep(0.1)
         if target_data is None:
             print("no detection")
         else:
@@ -68,7 +69,7 @@ async def main():
             try_request(url, "trigger_event", "0")
             camera_on = False
             no_detection_counter = 0
-        time.sleep(0.1)
+        # time.sleep(0.1)
 
 def hazard_check_required(target_data: Target, url, test = False):
     bike_speed = get_speed(url)
