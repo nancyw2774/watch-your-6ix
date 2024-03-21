@@ -18,7 +18,7 @@ speed_updated = False
 
 def gen_frames(): 
     start_time = time.time()
-    while time.time() - start_time < 300:
+    while time.time() - start_time < 30:
         frame = cam.capture_array()  # read the camera frame
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
